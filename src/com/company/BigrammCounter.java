@@ -40,6 +40,18 @@ public class BigrammCounter {
         return holder;
     }
 
+    public Object[] getArrayFromHashMap(HashMap<String, Integer> holder) {
+        Set<Map.Entry<String, Integer>> representationsHashSet = new HashSet<Map.Entry<String, Integer>>();
+        representationsHashSet = holder.entrySet();
+        Object[] a = representationsHashSet.toArray();
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(a[i]);
+        }
+        return a;
+    }
+
+
+
     private class Element {
 
 
@@ -53,41 +65,37 @@ public class BigrammCounter {
 
     }
 
+    private List<Element> elements = new ArrayList<Element>();
+
     public List<Element> hashMapToArrayOfElements(HashMap<String, Integer> holder) {
         Set<String> bigramms = new HashSet<String>();
-        List<Element> elementArray = new ArrayList<Element>();
         for (String a : bigramms) {
             this.size += holder.get(a);
             Element e = new Element(a, holder.get(a));
-            elementArray.add(e);
+            elements.add(e);
         }
-        return elementArray;
+        System.out.println("hashMapToArray passed");
+        return elements;
     }
 
-    public void countingProbability(List<Element> elements) {
+    public void countingProbability() {
+        hashMapToArrayOfElements(counter());
         for (int i = 0; i < elements.size(); i++) {
             elements.set(i, new Element(elements.get(i).key, elements.get(i).value / size));
         }
-    }
-
-    public void sortElementsByProbability(List<Element> elements) {
-        Collections.sort(elements, new Comparator<Element>(){
-            public int compare(Element o1, Element o2){
-               return o1.value.compareTo(o2.value);
+        Collections.sort(elements, new Comparator<Element>() {
+            public int compare(Element o1, Element o2) {
+                return o1.value.compareTo(o2.value);
             }
         });
-
+        for (int i = 0; i < elements.size(); i++) {
+            System.out.println(elements.get(i).key + " = " + elements.get(i).value);
+        }
+        System.out.println("countingProbability passed");
     }
 
-
-    public Object[] getArrayFromHashMap(HashMap<String, Integer> holder) {
-        Set<Map.Entry<String, Integer>> representationsHashSet = new HashSet<Map.Entry<String, Integer>>();
-        representationsHashSet = holder.entrySet();
-        Object[] a = representationsHashSet.toArray();
-        for (int i = 0; i < a.length; i++) {
-            System.out.println(a[i]);
-        }
-        return a;
+    public void check(){
+        elements.get(0).toString();
     }
 
 }
