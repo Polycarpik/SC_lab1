@@ -13,7 +13,7 @@ import java.util.*;
 public class BigrammCounter {
 
     private String text;
-    private int size;
+    private int total;
 
     public BigrammCounter() throws FileNotFoundException {
         this.text = "";
@@ -51,7 +51,6 @@ public class BigrammCounter {
     }
 
 
-
     private class Element {
 
 
@@ -60,6 +59,7 @@ public class BigrammCounter {
             this.value = value;
         }
 
+        double probability;
         Integer value;
         String key;
 
@@ -68,34 +68,37 @@ public class BigrammCounter {
     private List<Element> elements = new ArrayList<Element>();
 
     public List<Element> hashMapToArrayOfElements(HashMap<String, Integer> holder) {
-        Set<String> bigramms = new HashSet<String>();
+        Set<String> bigramms = holder.keySet();
         for (String a : bigramms) {
-            this.size += holder.get(a);
+            this.total += holder.get(a);
             Element e = new Element(a, holder.get(a));
             elements.add(e);
         }
-        System.out.println("hashMapToArray passed");
+        System.out.println("hashMapToArray passed, list size = " + elements.size());
         return elements;
     }
 
     public void countingProbability() {
         hashMapToArrayOfElements(counter());
         for (int i = 0; i < elements.size(); i++) {
-            elements.set(i, new Element(elements.get(i).key, elements.get(i).value / size));
+
+            Element a = new Element(elements.get(i).key, elements.get(i).value);
+            a.probability = (double) a.value / total;
+            elements.set(i, a);
         }
         Collections.sort(elements, new Comparator<Element>() {
             public int compare(Element o1, Element o2) {
-                return o1.value.compareTo(o2.value);
+                return o1.key.compareTo(o2.key);
             }
         });
         for (int i = 0; i < elements.size(); i++) {
-            System.out.println(elements.get(i).key + " = " + elements.get(i).value);
+            System.out.println(elements.get(i).key + " = " + elements.get(i).probability);
         }
         System.out.println("countingProbability passed");
     }
 
-    public void check(){
-        elements.get(0).toString();
+    public void check() {
+        System.out.println("bugaga " + elements.get(0).probability);
     }
 
 }
