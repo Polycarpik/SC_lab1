@@ -10,10 +10,10 @@ public class Main {
 
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 3; j++){
-                BigrammCounter a = new BigrammCounter(b[j] + c[i]);
-                a.countingProbability();
-                a.write("Letters_" + b[j] + c[i]);
-
+                Counter a = new Counter(b[j] + c[i]);
+                a.letterCounter();
+                a.crossingBigrammsCounter();
+                a.noncrossingBigrammsCounter();
             }
         }
 

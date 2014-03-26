@@ -1,20 +1,16 @@
 package com.company;
 
-import org.omg.CORBA.INTERNAL;
-
-import javax.lang.model.util.Elements;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
  * Created by Polina on 3/11/14.
  */
-public class BigrammCounter {
+public class Counter {
 
+    private String textName;
     private String text;
     private int total;
-    private List<Element> elements = new ArrayList<Element>();
 
     private class Element {
 
@@ -29,7 +25,8 @@ public class BigrammCounter {
 
     }
 
-    public BigrammCounter(String textName) throws FileNotFoundException {
+    public Counter(String textName) throws FileNotFoundException {
+        this.textName = textName;
         this.text = "";
         Scanner in = new Scanner(new File(textName));
         while (in.hasNext()) {
@@ -38,11 +35,11 @@ public class BigrammCounter {
         in.close();
     }
 
-    public HashMap<String, Integer> counter() {
+    private HashMap<String, Integer> counter(int step, int gramm) {
         HashMap<String, Integer> holder = new HashMap<String, Integer>();
         int length = this.text.length();
-        for (int i = 0; i + 1 < length; i += 2 ) {
-            String bigramm = this.text.substring(i, i + 2);
+        for (int i = 0; i + 1 < length; i += step) {
+            String bigramm = this.text.substring(i, i + gramm);
             if (!holder.containsKey(bigramm)) {
                 holder.put(bigramm, 1);
             } else {
@@ -54,17 +51,18 @@ public class BigrammCounter {
         return holder;
     }
 
-    public Object[] getArrayFromHashMap(HashMap<String, Integer> holder) {
-        Set<Map.Entry<String, Integer>> representationsHashSet = new HashSet<Map.Entry<String, Integer>>();
-        representationsHashSet = holder.entrySet();
-        Object[] a = representationsHashSet.toArray();
-        for (int i = 0; i < a.length; i++) {
-            System.out.println(a[i]);
-        }
-        return a;
-    }
+//    public Object[] getArrayFromHashMap(HashMap<String, Integer> holder) {
+//        Set<Map.Entry<String, Integer>> representationsHashSet = new HashSet<Map.Entry<String, Integer>>();
+//        representationsHashSet = holder.entrySet();
+//        Object[] a = representationsHashSet.toArray();
+//        for (int i = 0; i < a.length; i++) {
+//            System.out.println(a[i]);
+//        }
+//        return a;
+//    }
 
-    public List<Element> hashMapToArrayOfElements(HashMap<String, Integer> holder) {
+    private List<Element> hashMapToArrayOfElements(HashMap<String, Integer> holder) {
+        List<Element> elements = new ArrayList<Element>();
         Set<String> bigramms = holder.keySet();
         for (String a : bigramms) {
             this.total += holder.get(a);
@@ -75,12 +73,11 @@ public class BigrammCounter {
         return elements;
     }
 
-    public void countingProbability() {
-        hashMapToArrayOfElements(counter());
+    private void countingProbability(List<Element> elements) {
         for (int i = 0; i < elements.size(); i++) {
 
             Element a = new Element(elements.get(i).key, elements.get(i).value);
-            a.probability = (double) a.value / 2*total;
+            a.probability = (double) a.value / (total);
             elements.set(i, a);
         }
         Collections.sort(elements, new Comparator<Element>() {
@@ -94,32 +91,51 @@ public class BigrammCounter {
 
         }
         System.out.println("Total is " + total);
-        System.out.println("entropy = " + entropyCounter());
-
+//        System.out.println("entropy = " + entropyCounter(elements));
     }
 
-    public double entropyCounter() {
+    private double entropyCounter(List<Element> elements, int gramm) {
         double entropy = 0;
         for (int i = 0; i < elements.size(); i++) {
             entropy += elements.get(i).probability * (Math.log(elements.get(i).probability) / Math.log(2));
         }
-        return -entropy;
+        return -entropy / gramm;
     }
 
-    public void write(String fileName) {
+    private void toFile(String addon,String fileName, List<Element> elements, int gramm) {
         try {
-            PrintWriter out = new PrintWriter(new File(fileName).getAbsoluteFile());
+            PrintWriter out = new PrintWriter(new File(addon + fileName).getAbsoluteFile());
             try {
                 for (int i = 0; i < elements.size(); i++) {
                     out.println(elements.get(i).key + " = " + elements.get(i).probability);
                 }
-                out.println("entropy = " + entropyCounter());
+                out.println("entropy = " + entropyCounter(elements, gramm));
             } finally {
                 out.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void letterCounter() {
+        List<Element> elements = hashMapToArrayOfElements(counter(1, 1));
+        countingProbability(elements);
+        toFile("letters_", textName, elements, 1);
+    }
+
+    public void crossingBigrammsCounter() {
+        List<Element> elements = hashMapToArrayOfElements(counter(1, 2));
+        countingProbability(elements);
+        toFile("crossingBigramms_", textName, elements, 2);
+
+    }
+
+    public void noncrossingBigrammsCounter() {
+        List<Element> elements = hashMapToArrayOfElements(counter(2, 2));
+        countingProbability(elements);
+        toFile("noncrossingBigramms", textName, elements, 2);
+
     }
 
 }
