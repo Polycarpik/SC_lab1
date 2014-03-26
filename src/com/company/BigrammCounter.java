@@ -41,8 +41,8 @@ public class BigrammCounter {
     public HashMap<String, Integer> counter() {
         HashMap<String, Integer> holder = new HashMap<String, Integer>();
         int length = this.text.length();
-        for (int i = 1; i < length; i++) {
-            String bigramm = this.text.substring(i - 1, i);
+        for (int i = 0; i + 1 < length; i += 2 ) {
+            String bigramm = this.text.substring(i, i + 2);
             if (!holder.containsKey(bigramm)) {
                 holder.put(bigramm, 1);
             } else {
@@ -71,6 +71,7 @@ public class BigrammCounter {
             Element e = new Element(a, holder.get(a));
             elements.add(e);
         }
+        total++;
         return elements;
     }
 
@@ -79,7 +80,7 @@ public class BigrammCounter {
         for (int i = 0; i < elements.size(); i++) {
 
             Element a = new Element(elements.get(i).key, elements.get(i).value);
-            a.probability = (double) a.value / total;
+            a.probability = (double) a.value / 2*total;
             elements.set(i, a);
         }
         Collections.sort(elements, new Comparator<Element>() {
@@ -87,9 +88,13 @@ public class BigrammCounter {
                 return -(o1.probability.compareTo(o2.probability));
             }
         });
-//        for (int i = 0; i < elements.size(); i++) {
-//            System.out.println(elements.get(i).key + " = " + elements.get(i).value);
-//        }
+        for (int i = 0; i < elements.size(); i++) {
+            System.out.println(elements.get(i).key + " = " + elements.get(i).value);
+            System.out.println(elements.get(i).key + " = " + elements.get(i).probability);
+
+        }
+        System.out.println("Total is " + total);
+        System.out.println("entropy = " + entropyCounter());
 
     }
 
